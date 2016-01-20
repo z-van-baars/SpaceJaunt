@@ -78,20 +78,18 @@ class Level_01(Level):
         self.background = assets.stars
         self.level_limit = 11800
 
-        level = [[210, 40, 500, 550],
-                 [210, 40, 250, 450],
-                 [210, 40, 600, 350],
+        level = [[210, 30, 300, 405],
+                 [210, 30, 700, 413],
                  ]
 
-        level = []
         spiders = []
         robots = []
-        for x in range(30):
-            random_x = random.randint(800, 11600)
-            spiders.append((random_x, 535))
-        for x in range(30):
-            random_x = random.randint(800, 11600)
-            robots.append((random_x, 535))
+        # for x in range(30):
+            # random_x = random.randint(800, 11600)
+            # spiders.append((random_x, 535))
+        # for x in range(30):
+            # random_x = random.randint(800, 11600)
+            # robots.append((random_x, 535))
         for each in spiders:
             new_spider = enemy.Spider()
             new_spider.rect.x = each[0]

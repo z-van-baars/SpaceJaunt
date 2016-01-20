@@ -119,6 +119,8 @@ def main(assets, utilities, player, levels, enemy):
                     player_char.jump()
                 if event.key == pygame.K_r:
                     player_char.reload()
+                if event.key == pygame.K_LCTRL:
+                    player_char.crouch()
                 if event.key == pygame.K_RETURN:
                     new_spider = enemy.Robot()
                     new_spider.rect.x = 600
@@ -144,6 +146,9 @@ def main(assets, utilities, player, levels, enemy):
                     player_char.change_x = 0
                 if event.key == pygame.K_d:
                     player_char.change_x = 0
+                if event.key == pygame.K_LCTRL:
+                    player_char.crouched = False
+                    player_char.try_stand = True
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 player_char.firing = True
@@ -170,7 +175,10 @@ def main(assets, utilities, player, levels, enemy):
         assets.screen.blit(ammo_stamp, [100, 5])
         assets.screen.blit(mag_stamp, [150, 5])
         assets.screen.blit(health_bar.image, [61, 30])
-        assets.screen.blit(player_char.arm_images[player_char.arm_state], [player_char.rect.x - 2, player_char.rect.y - 12])
+        if player_char.crouched and player_char.change_y == 0:
+            assets.screen.blit(player_char.arm_images[player_char.arm_state], [player_char.rect.x - 12, player_char.rect.y - 12])
+        else:
+            assets.screen.blit(player_char.arm_images[player_char.arm_state], [player_char.rect.x - 12, player_char.rect.y - 12])
 
         if player_char.health < 1:
             lost = True

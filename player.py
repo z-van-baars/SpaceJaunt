@@ -23,6 +23,8 @@ class Player(pygame.sprite.Sprite):
         self.health = 100
         self.arm_state = 3
         self.webcounter = 0
+        self.crouched = False
+        self.try_stand = False
 
         pistol = weapons.Pistol()
         self.weapon_list.append(pistol)
@@ -50,28 +52,47 @@ class Player(pygame.sprite.Sprite):
 
         self.walking_frames_r = []
 
-        image = sprite_sheet.get_image(0, 0, 65, 85)
+        image = sprite_sheet.get_image(10, 0, 50, 85)
         self.walking_frames_r.append(image)
-        image = sprite_sheet.get_image(65, 0, 65, 85)
+        image = sprite_sheet.get_image(75, 0, 50, 85)
         for x in range(7):
             self.walking_frames_r.append(image)
-        image = sprite_sheet.get_image(130, 0, 65, 85)
+        image = sprite_sheet.get_image(140, 0, 50, 85)
         for x in range(7):
             self.walking_frames_r.append(image)
-        image = sprite_sheet.get_image(195, 0, 65, 85)
+        image = sprite_sheet.get_image(205, 0, 50, 85)
         for x in range(7):
             self.walking_frames_r.append(image)
-        image = sprite_sheet.get_image(130, 0, 65, 85)
+        image = sprite_sheet.get_image(140, 0, 50, 85)
         for x in range(7):
             self.walking_frames_r.append(image)
 
-        image = sprite_sheet.get_image(260, 0, 65, 85)
+        image = sprite_sheet.get_image(270, 0, 50, 85)
         self.walking_frames_r.append(image)
 
-        image = sprite_sheet.get_image(325, 0, 65, 85)
+        image = sprite_sheet.get_image(335, 0, 50, 85)
         self.walking_frames_r.append(image)
 
         self.image = self.walking_frames_r[self.frame]
+
+        self.crouched_frames_r = []
+
+        image = sprite_sheet.get_image(10, 95, 50, 75)
+        self.crouched_frames_r.append(image)
+        image = sprite_sheet.get_image(75, 95, 50, 75)
+        for x in range(7):
+            self.crouched_frames_r.append(image)
+        image = sprite_sheet.get_image(140, 95, 50, 75)
+        for x in range(7):
+            self.crouched_frames_r.append(image)
+        image = sprite_sheet.get_image(205, 95, 50, 75)
+        for x in range(7):
+            self.crouched_frames_r.append(image)
+        image = sprite_sheet.get_image(140, 95, 50, 75)
+        for x in range(7):
+            self.crouched_frames_r.append(image)
+        image = sprite_sheet.get_image(10, 95, 50, 75)
+        self.crouched_frames_r.append(image)
 
         self.rect = self.image.get_rect()
 
@@ -104,6 +125,8 @@ class Player(pygame.sprite.Sprite):
             self.arm_state = 6
 
     def get_frame(self):
+        old_x = self.rect.x
+        old_y = self.rect.y
         if self.change_x == 0 and self.change_y == 0:
             self.frame = 0
         if self.change_y != 0:
@@ -120,9 +143,18 @@ class Player(pygame.sprite.Sprite):
             self.change_x = 0
             self.change_y = 0
             self.frame = 30
-        self.image = self.walking_frames_r[self.frame]
+
+        if self.crouched:
+            self.image = self.crouched_frames_r[self.frame]
+        else:
+            self.image = self.walking_frames_r[self.frame]
+        self.rect = self.image.get_rect()
+        self.rect.x = old_x
+        self.rect.y = old_y
 
     def update(self, pos):
+        if self.try_stand:
+            self.uncrouch()
         self.get_arm_state(pos)
         if self.firing and self.webcounter == 0:
             self.shoot(pos)
@@ -159,7 +191,24 @@ class Player(pygame.sprite.Sprite):
 
             # Stop our vertical movement
             self.change_y = 0
+
         self.get_frame()
+
+    def crouch(self):
+        if not self.crouched:
+            self.rect.y += 10
+            self.crouched = True
+            self.was_crouched = True
+
+    def uncrouch(self):
+        self.rect.y -= 10
+        block_hit_list = pygame.sprite.spritecollide(self, self.current_level.platform_list, False)
+        if block_hit_list:
+            self.crouched = True
+            self.rect.y += 10
+        else:
+            self.crouched = False
+            self.try_stand = False
 
     def calc_grav(self):
         if self.change_y == 0:
