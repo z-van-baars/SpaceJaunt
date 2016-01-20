@@ -78,6 +78,8 @@ class Spider(Enemy):
         self.frame = 0
         self.dead = False
         self.death_sound = assets.spider_death_sound
+        self.shoot_timer = 5
+        self.alt_shoot_timer = 20
 
         self.walking_frames = []
         self.death_frames = []
@@ -143,10 +145,13 @@ class Spider(Enemy):
 
     def update(self, player, world_shift, current_level):
         if self.health > 0:
-            if player.rect.x + world_shift < self.rect.x + 100:
+            if player.rect.x > self.rect.x - 800 and player.rect.x <= self.rect.x - 80:
                 self.change_x = -self.speed
-            elif player.rect.x + world_shift == self.rect.x:
+                if player.rect.x > self.rect.x - 500:
+                    self.alt_shoot_timer = self.shoot(projectiles.SpiderBlob(), self.alt_shoot_timer, player, current_level)
+            elif player.rect.x > self.rect.x - 80:
                 self.change_x = 0
+                self.shoot_timer = self.shoot(projectiles.SpiderWeb(), self.shoot_timer, player, current_level)
             else:
                 self.change_x = 0
             self.get_frame()
@@ -156,6 +161,16 @@ class Spider(Enemy):
         self.calc_grav()
         self.move()
         self.collide(current_level)
+
+    def shoot(self, projectile, timer, player, current_level):
+        timer -= 1
+        if timer == 0:
+            timer = projectile.reset_timer()
+            new_projectile = projectile
+            new_projectile.rect.x = self.rect.x + new_projectile.origin_x
+            new_projectile.rect.y = self.rect.y + new_projectile.origin_y
+            current_level.enemy_projectiles_list.add(new_projectile)
+        return(timer)
 
     def get_frame(self):
         if self.change_x > 0 or self.change_x < 0:
@@ -178,6 +193,8 @@ class Robot(Enemy):
         self.dead = False
         self.death_sound = assets.spider_death_sound
         self.shoot_timer = 60
+        self.reg_fire = type(RobotMissile())
+        self.alt_fire = None
 
         self.walking_frames = []
         self.death_frames = []
@@ -264,7 +281,6 @@ class Robot(Enemy):
         self.death_frames.append(image)
         self.death_frames.append(image)
 
-
         self.image = self.walking_frames[self.frame]
         self.rect = self.image.get_rect()
 
@@ -273,7 +289,7 @@ class Robot(Enemy):
             if player.rect.x > self.rect.x - 800 and player.rect.x < self.rect.x - 200:
                 self.change_x = -self.speed
             if player.rect.x > self.rect.x - 800:
-                self.shoot(player, current_level)
+                self.shoot(self.reg_fire, player, current_level)
                 if player.rect.x > self.rect.x - 150:
                     self.change_x = 0
             self.get_frame()
@@ -284,8 +300,7 @@ class Robot(Enemy):
         self.move()
         self.collide(current_level)
 
-    def shoot(self, player, current_level):
-        print(self.shoot_timer)
+    def shoot(self, projectile, player, current_level):
         self.shoot_timer -= 1
         if self.shoot_timer == 0:
             self.shoot_timer = random.randrange(90, 210, 30)

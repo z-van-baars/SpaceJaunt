@@ -3,6 +3,7 @@ import assets
 import platforms
 import enemy
 import random
+from projectiles import SpiderBlob
 
 
 class Level():
@@ -27,13 +28,17 @@ class Level():
         for each in self.enemy_projectiles_list:
             each.rect.x -= each.change_x
             each.rect.y -= each.change_y
-            if each.rect.x < 0:
+            each.timeout -= 1
+            if each.timeout == 0 or each.rect.x < 0:
                 self.enemy_projectiles_list.remove(each)
         hits = pygame.sprite.spritecollide(player, self.enemy_projectiles_list, False)
         for each in hits:
             player.health -= each.damage
             self.enemy_projectiles_list.remove(each)
             assets.player_hit_sound.play()
+            if type(each) == type(SpiderBlob()) and player.webcounter == 0:
+                print("you got webbed")
+                player.webcounter = 90
         for foe in self.enemy_list:
             foe.update(player, self.world_shift, self)
 
@@ -83,7 +88,7 @@ class Level_01(Level):
             random_x = random.randint(800, 11600)
             enemies.append((random_x, 535))
         for each in enemies:
-            new_enemy = enemy.Robot()
+            new_enemy = enemy.Spider()
             new_enemy.rect.x = each[0]
             new_enemy.rect.y = each[1]
             self.enemy_list.add(new_enemy)

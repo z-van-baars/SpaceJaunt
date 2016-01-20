@@ -34,6 +34,10 @@ player_hit_sound = pygame.mixer.Sound("sound/player_hit.wav")
 game_over_sound = pygame.mixer.Sound("sound/game_over.wav")
 
 floor_image = pygame.image.load("art/floor_64.png")
+spider_web_image = pygame.image.load("art/spider_web.png")
+spider_blob_image = pygame.image.load('art/spider_blob.png')
+spider_blob_image.set_colorkey(key)
+spider_web_image.set_colorkey(key)
 
 shootman.set_colorkey(key)
 

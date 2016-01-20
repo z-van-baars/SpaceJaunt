@@ -22,6 +22,7 @@ class Player(pygame.sprite.Sprite):
         self.max_health = 100
         self.health = 100
         self.arm_state = 3
+        self.webcounter = 0
 
         self.arm_images = []
         sprite_sheet = Spritesheet("art/shootman_arms.png")
@@ -80,6 +81,9 @@ class Player(pygame.sprite.Sprite):
         image = sprite_sheet.get_image(260, 0, 65, 85)
         self.walking_frames_r.append(image)
 
+        image = sprite_sheet.get_image(325, 0, 65, 85)
+        self.walking_frames_r.append(image)
+
         self.image = self.walking_frames_r[self.frame]
 
         self.rect = self.image.get_rect()
@@ -125,14 +129,21 @@ class Player(pygame.sprite.Sprite):
             self.frame -= 1
             if self.frame < 1:
                 self.frame = 18
+        if self.webcounter > 0:
+            self.change_x = 0
+            self.change_y = 0
+            self.frame = 20
         self.image = self.walking_frames_r[self.frame]
 
     def update(self, pos):
         self.get_arm_state(pos)
-        if self.firing:
+        if self.firing and self.webcounter == 0:
             self.shoot(pos)
         # Gravity
         self.calc_grav()
+        if self.webcounter > 0:
+            self.change_x = 0
+            self.webcounter -= 1
 
         # Move left/right
         self.rect.x += self.change_x
