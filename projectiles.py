@@ -36,9 +36,11 @@ class RobotMissile(Projectile):
         self.damage = 20
         self.change_x = self.speed
         self.timeout = 6000
+        self.origin_x = -20
+        self.origin_y = 20
 
     def reset_timer(self):
-        time = random.randrange(60, 210, 30)
+        time = random.randrange(120, 240, 30)
         return time
 
 
@@ -60,7 +62,7 @@ class SpiderWeb(Projectile):
 
 class SpiderBlob(Projectile):
     def __init__(self):
-        super().__init__(19, 8, 6, assets.white)
+        super().__init__(19, 8, 10, assets.white)
         self.image = assets.spider_blob_image
         self.rect = self.image.get_rect()
         self.change_x = self.speed

@@ -39,6 +39,7 @@ class Level():
             if type(each) == type(SpiderBlob()) and player.webcounter == 0:
                 print("you got webbed")
                 player.webcounter = 90
+                assets.webbed_sound.play()
         for foe in self.enemy_list:
             foe.update(player, self.world_shift, self)
 
@@ -83,15 +84,24 @@ class Level_01(Level):
                  ]
 
         level = []
-        enemies = []
+        spiders = []
+        robots = []
         for x in range(30):
             random_x = random.randint(800, 11600)
-            enemies.append((random_x, 535))
-        for each in enemies:
-            new_enemy = enemy.Spider()
-            new_enemy.rect.x = each[0]
-            new_enemy.rect.y = each[1]
-            self.enemy_list.add(new_enemy)
+            spiders.append((random_x, 535))
+        for x in range(30):
+            random_x = random.randint(800, 11600)
+            robots.append((random_x, 535))
+        for each in spiders:
+            new_spider = enemy.Spider()
+            new_spider.rect.x = each[0]
+            new_spider.rect.y = each[1]
+            self.enemy_list.add(new_spider)
+        for each in robots:
+            new_robot = enemy.Robot()
+            new_robot.rect.x = each[0]
+            new_robot.rect.y = each[1]
+            self.enemy_list.add(new_robot)
 
         for platform in level:
             block = platforms.Platform(platform[0], platform[1])

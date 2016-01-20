@@ -12,9 +12,9 @@ class Player(pygame.sprite.Sprite):
         self.change_x = 0
         self.change_y = 0
         self.current_level = None
-        self.weapons = weapons.weapons
+        self.weapon_list = []
         self.current_weapon = 0
-        self.weapon = self.weapons[self.current_weapon]
+        self.weapon = None
         self.speed = 5
         self.face = 'R'
         self.frame = 0
@@ -24,26 +24,25 @@ class Player(pygame.sprite.Sprite):
         self.arm_state = 3
         self.webcounter = 0
 
+        pistol = weapons.Pistol()
+        self.weapon_list.append(pistol)
+
+        self.weapon = self.weapon_list[self.current_weapon]
+
         self.arm_images = []
         sprite_sheet = Spritesheet("art/shootman_arms.png")
         image = sprite_sheet.get_image(0, 0, 65, 72)
         self.arm_images.append(image)
-
         image = sprite_sheet.get_image(65, 0, 65, 72)
         self.arm_images.append(image)
-
         image = sprite_sheet.get_image(130, 0, 65, 72)
         self.arm_images.append(image)
-
         image = sprite_sheet.get_image(195, 0, 65, 72)
         self.arm_images.append(image)
-
         image = sprite_sheet.get_image(260, 0, 65, 72)
         self.arm_images.append(image)
-
         image = sprite_sheet.get_image(325, 0, 65, 72)
         self.arm_images.append(image)
-
         image = sprite_sheet.get_image(390, 0, 65, 72)
         self.arm_images.append(image)
 
@@ -53,30 +52,18 @@ class Player(pygame.sprite.Sprite):
 
         image = sprite_sheet.get_image(0, 0, 65, 85)
         self.walking_frames_r.append(image)
-
         image = sprite_sheet.get_image(65, 0, 65, 85)
-        self.walking_frames_r.append(image)
-        self.walking_frames_r.append(image)
-        self.walking_frames_r.append(image)
-        self.walking_frames_r.append(image)
-        self.walking_frames_r.append(image)
-        self.walking_frames_r.append(image)
-
+        for x in range(7):
+            self.walking_frames_r.append(image)
         image = sprite_sheet.get_image(130, 0, 65, 85)
-        self.walking_frames_r.append(image)
-        self.walking_frames_r.append(image)
-        self.walking_frames_r.append(image)
-        self.walking_frames_r.append(image)
-        self.walking_frames_r.append(image)
-        self.walking_frames_r.append(image)
-
+        for x in range(7):
+            self.walking_frames_r.append(image)
         image = sprite_sheet.get_image(195, 0, 65, 85)
-        self.walking_frames_r.append(image)
-        self.walking_frames_r.append(image)
-        self.walking_frames_r.append(image)
-        self.walking_frames_r.append(image)
-        self.walking_frames_r.append(image)
-        self.walking_frames_r.append(image)
+        for x in range(7):
+            self.walking_frames_r.append(image)
+        image = sprite_sheet.get_image(130, 0, 65, 85)
+        for x in range(7):
+            self.walking_frames_r.append(image)
 
         image = sprite_sheet.get_image(260, 0, 65, 85)
         self.walking_frames_r.append(image)
@@ -101,38 +88,38 @@ class Player(pygame.sprite.Sprite):
 
         factor = y_dist / x_dist
         arm_angle = math.degrees(math.atan(factor))
-        if arm_angle < -51:
+        if arm_angle <= -60:
             self.arm_state = 0
-        elif -28 > arm_angle > -51:
+        elif -35 >= arm_angle > -60:
             self.arm_state = 1
-        elif -15 > arm_angle > -29:
+        elif -15 >= arm_angle > -35:
             self.arm_state = 2
         elif 15 > arm_angle > -15:
             self.arm_state = 3
-        elif 28 > arm_angle > 14:
+        elif 35 > arm_angle >= 15:
             self.arm_state = 4
-        elif 50 > arm_angle > 27:
+        elif 60 > arm_angle >= 35:
             self.arm_state = 5
-        elif arm_angle > 49:
+        elif arm_angle >= 60:
             self.arm_state = 6
 
     def get_frame(self):
         if self.change_x == 0 and self.change_y == 0:
             self.frame = 0
         if self.change_y != 0:
-            self.frame = 19
+            self.frame = 29
         elif self.change_x > 0:
             self.frame += 1
-            if self.frame > 18:
+            if self.frame > 28:
                 self.frame = 1
         elif self.change_x < 0:
             self.frame -= 1
             if self.frame < 1:
-                self.frame = 18
+                self.frame = 28
         if self.webcounter > 0:
             self.change_x = 0
             self.change_y = 0
-            self.frame = 20
+            self.frame = 30
         self.image = self.walking_frames_r[self.frame]
 
     def update(self, pos):

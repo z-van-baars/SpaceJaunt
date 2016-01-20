@@ -55,6 +55,17 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.x += self.change_x
         self.rect.y += self.change_y
 
+    def shoot(self, projectile, timer, player, current_level, fire_sound):
+        timer -= 1
+        if timer == 0:
+            timer = projectile.reset_timer()
+            new_projectile = projectile
+            new_projectile.rect.x = self.rect.x + new_projectile.origin_x
+            new_projectile.rect.y = self.rect.y + new_projectile.origin_y
+            current_level.enemy_projectiles_list.add(new_projectile)
+            fire_sound.play()
+        return(timer)
+
     def death(self):
         if not self.dead:
             self.death_sound.play()
@@ -80,6 +91,8 @@ class Spider(Enemy):
         self.death_sound = assets.spider_death_sound
         self.shoot_timer = 5
         self.alt_shoot_timer = 20
+        self.fire_sound = assets.web_shoot_sound
+        self.altfire_sound = assets.blob_shoot_sound
 
         self.walking_frames = []
         self.death_frames = []
@@ -148,10 +161,10 @@ class Spider(Enemy):
             if player.rect.x > self.rect.x - 800 and player.rect.x <= self.rect.x - 80:
                 self.change_x = -self.speed
                 if player.rect.x > self.rect.x - 500:
-                    self.alt_shoot_timer = self.shoot(projectiles.SpiderBlob(), self.alt_shoot_timer, player, current_level)
+                    self.alt_shoot_timer = self.shoot(projectiles.SpiderBlob(), self.alt_shoot_timer, player, current_level, self.altfire_sound)
             elif player.rect.x > self.rect.x - 80:
                 self.change_x = 0
-                self.shoot_timer = self.shoot(projectiles.SpiderWeb(), self.shoot_timer, player, current_level)
+                self.shoot_timer = self.shoot(projectiles.SpiderWeb(), self.shoot_timer, player, current_level, self.fire_sound)
             else:
                 self.change_x = 0
             self.get_frame()
@@ -161,16 +174,6 @@ class Spider(Enemy):
         self.calc_grav()
         self.move()
         self.collide(current_level)
-
-    def shoot(self, projectile, timer, player, current_level):
-        timer -= 1
-        if timer == 0:
-            timer = projectile.reset_timer()
-            new_projectile = projectile
-            new_projectile.rect.x = self.rect.x + new_projectile.origin_x
-            new_projectile.rect.y = self.rect.y + new_projectile.origin_y
-            current_level.enemy_projectiles_list.add(new_projectile)
-        return(timer)
 
     def get_frame(self):
         if self.change_x > 0 or self.change_x < 0:
@@ -193,8 +196,8 @@ class Robot(Enemy):
         self.dead = False
         self.death_sound = assets.spider_death_sound
         self.shoot_timer = 60
-        self.reg_fire = type(RobotMissile())
-        self.alt_fire = None
+        self.alt_shoot_timer = 10
+        self.fire_sound = assets.missile_fire
 
         self.walking_frames = []
         self.death_frames = []
@@ -289,7 +292,7 @@ class Robot(Enemy):
             if player.rect.x > self.rect.x - 800 and player.rect.x < self.rect.x - 200:
                 self.change_x = -self.speed
             if player.rect.x > self.rect.x - 800:
-                self.shoot(self.reg_fire, player, current_level)
+                self.shoot_timer = self.shoot(projectiles.RobotMissile(), self.shoot_timer, player, current_level, self.fire_sound)
                 if player.rect.x > self.rect.x - 150:
                     self.change_x = 0
             self.get_frame()
@@ -299,16 +302,6 @@ class Robot(Enemy):
         self.calc_grav()
         self.move()
         self.collide(current_level)
-
-    def shoot(self, projectile, player, current_level):
-        self.shoot_timer -= 1
-        if self.shoot_timer == 0:
-            self.shoot_timer = random.randrange(90, 210, 30)
-            new_missile = projectiles.RobotMissile()
-            new_missile.rect.x = self.rect.x
-            new_missile.rect.y = self.rect.y + 20
-            current_level.enemy_projectiles_list.add(new_missile)
-            assets.missile_fire.play()
 
     def get_frame(self):
         if self.change_x > 0 or self.change_x < 0:
